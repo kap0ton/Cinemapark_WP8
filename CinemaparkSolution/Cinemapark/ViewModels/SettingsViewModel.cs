@@ -30,10 +30,34 @@ namespace Cinemapark.ViewModels
             }
         }
 
+        private bool _progressBarIsIndeterminate;
+        public bool ProgressBarIsIndeterminate
+        {
+            get { return _progressBarIsIndeterminate; }
+            set
+            {
+                _progressBarIsIndeterminate = value;
+                OnPropertyChanged("ProgressBarIsIndeterminate");
+            }
+        }
+
+        private Visibility _progressBarVisibility;
+        public Visibility ProgressBarVisibility
+        {
+            get { return _progressBarVisibility; }
+            set
+            {
+                _progressBarVisibility = value;
+                OnPropertyChanged("ProgressBarVisibility");
+            }
+        }
+
         public SettingsViewModel()
         {
             _appSettings = new AppSettings();
             _multiplexes = new ObservableCollection<Multiplex>();
+            ProgressBarIsIndeterminate = false;
+            ProgressBarVisibility = Visibility.Collapsed;
         }
 
         public void LoadMultiplexes()
@@ -41,6 +65,7 @@ namespace Cinemapark.ViewModels
             var client = new WebClient();
             client.DownloadStringCompleted += GetMultiplexesCompleted;
             client.DownloadStringAsync(new Uri(Multiplex.MultiplexUri, UriKind.Absolute));
+            UpdateProgressBar(true);
         }
 
         private void GetMultiplexesCompleted(object sender, DownloadStringCompletedEventArgs e)
@@ -67,6 +92,10 @@ namespace Cinemapark.ViewModels
             {
                 MessageBox.Show(ex.Message);
             }
+            finally
+            {
+                UpdateProgressBar(false);
+            }
         }
 
         private void SetSelectedMultiplex()
@@ -80,6 +109,20 @@ namespace Cinemapark.ViewModels
         public void SaveSelectedMultiplex()
         {
             _appSettings.Multiplex = SelectedMultiplex;
+        }
+
+        private void UpdateProgressBar(bool isEnabled)
+        {
+            if (isEnabled)
+            {
+                ProgressBarIsIndeterminate = true;
+                ProgressBarVisibility = Visibility.Visible;
+            }
+            else
+            {
+                ProgressBarIsIndeterminate = false;
+                ProgressBarVisibility = Visibility.Collapsed;
+            }
         }
 
         #region INotifyPropertyChanged Members

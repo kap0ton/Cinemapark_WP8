@@ -21,6 +21,10 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <ProgressBar VerticalAlignment="Top"
+                     IsIndeterminate="{Binding Path=ProgressBarIsIndeterminate}"
+                     Visibility="{Binding Path=ProgressBarVisibility}" />
+        
         <!--TitlePanel contains the name of the application and page title-->
         <StackPanel Grid.Row="0" Margin="12,17,0,28">
             <TextBlock Text="MY APPLICATION" Style="{StaticResource PhoneTextNormalStyle}"/>
