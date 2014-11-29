@@ -84,6 +84,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DataService.cs" />
+    <Compile Include="Entities\Movie.cs" />
     <Compile Include="Entities\Multiplex.cs" />
     <Compile Include="Helpers\ExpressionsHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

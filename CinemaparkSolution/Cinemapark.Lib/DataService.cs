@@ -15,12 +15,26 @@ namespace Cinemapark.Lib
             var xElement = XElement.Load(textReader);
 
             return (from item in xElement.Descendants("item")
-                         select new Multiplex
-                         {
-                             City = item.GetAttributeOrDefault("city"),
-                             Title = item.GetAttributeOrDefault("title"),
-                             MultiplexId = item.GetAttributeIntOrDefault("id")
-                         }).OrderBy(x => x.City).ThenBy(y => y.Title).ToList();
+                    select new Multiplex
+                    {
+                        City = item.GetAttributeOrDefault("city"),
+                        Title = item.GetAttributeOrDefault("title"),
+                        MultiplexId = item.GetAttributeIntOrDefault("id")
+                    }).OrderBy(x => x.City).ThenBy(y => y.Title).ToList();
+        }
+
+        public static List<Movie> ParseMovieCollection(string xml, int multiplexId)
+        {
+            TextReader textReader = new StringReader(xml);
+            var xElement = XElement.Load(textReader);
+
+            return (from item in xElement.Descendants("item")
+                    select new Movie
+                    {
+                        Title = item.GetAttributeOrDefault("title"),
+                        MovieId = item.GetAttributeIntOrDefault("id"),
+                        MultiplexId = multiplexId
+                    }).OrderBy(x => x.Title).ToList();
         }
     }
 }
