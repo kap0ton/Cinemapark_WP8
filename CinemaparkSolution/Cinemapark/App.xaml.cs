@@ -1,4 +1,5 @@
-﻿using Cinemapark.Resources;
+﻿using Cinemapark.Lib.DB;
+using Cinemapark.Resources;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using System;
@@ -66,6 +67,13 @@ namespace Cinemapark
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+            using (var db = new MovieDataContext())
+            {
+                if (!db.DatabaseExists())
+                {
+                    db.CreateDatabase();
+                }
+            }
         }
 
         // Code to execute when the application is activated (brought to foreground)

@@ -1,4 +1,5 @@
-﻿using Cinemapark.Lib.Entities;
+﻿using Cinemapark.Lib.DB;
+using Cinemapark.Lib.Entities;
 using Cinemapark.Lib.Helpers;
 using System.Collections.Generic;
 using System.IO;
@@ -9,18 +10,31 @@ namespace Cinemapark.Lib
 {
     public class DataService
     {
-        public static List<Multiplex> ParseMultiplexCollection(string xml)
-        {
-            TextReader textReader = new StringReader(xml);
-            var xElement = XElement.Load(textReader);
+        private MovieDataContext _db;
 
-            return (from item in xElement.Descendants("item")
-                    select new Multiplex
-                    {
-                        City = item.GetAttributeOrDefault("city"),
-                        Title = item.GetAttributeOrDefault("title"),
-                        MultiplexId = item.GetAttributeIntOrDefault("id")
-                    }).OrderBy(x => x.City).ThenBy(y => y.Title).ToList();
+        public DataService()
+        {
+            _db = new MovieDataContext();
+        }
+
+        public List<Multiplex> GetMultiplexes()
+        {
+            return _db.Multiplexes.ToList();
+        }
+
+        
+
+        public void SaveMultiplexes(List<Multiplex> items)
+        {
+            foreach(var m in _db.Multiplexes)
+            {
+                _db.Multiplexes.DeleteOnSubmit(m);
+            }
+            _db.SubmitChanges();
+
+            _db.Multiplexes.InsertAllOnSubmit(items);
+
+            _db.SubmitChanges();
         }
 
         public static List<Movie> ParseMovieCollection(string xml, int multiplexId)

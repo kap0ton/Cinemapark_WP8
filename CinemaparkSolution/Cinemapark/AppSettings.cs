@@ -1,4 +1,5 @@
 ﻿using Cinemapark.Lib.Entities;
+using System;
 using System.IO.IsolatedStorage;
 
 namespace Cinemapark
@@ -33,6 +34,42 @@ namespace Cinemapark
             set
             {
                 if (AddOrUpdateValue(MultiplexKey, value))
+                    Save();
+            }
+        }
+
+        #endregion
+
+        #region Date Last Updated
+
+        private const string DateLastUpdatedKey = "DateLastUpdatedKey";
+
+        public DateTime DateLastUpdated
+        {
+            get { return GetValueOrDefault<DateTime>(DateLastUpdatedKey, DateTime.MinValue); }
+            set
+            {
+                if (AddOrUpdateValue(DateLastUpdatedKey, value))
+                    Save();
+            }
+        }
+
+        #endregion
+
+        #region Update Interval
+
+        private const string UpdateIntervalKey = "UpdateIntervalKey";
+
+        public UpdateIntervalEnum UpdateInterval
+        {
+            get
+            {
+                var t = GetValueOrDefault<string>(UpdateIntervalKey, UpdateIntervalEnum.Daily.ToString());
+                return (UpdateIntervalEnum)Enum.Parse(typeof(UpdateIntervalEnum), t);
+            }
+            set
+            {
+                if (AddOrUpdateValue(UpdateIntervalKey, value.ToString()))
                     Save();
             }
         }

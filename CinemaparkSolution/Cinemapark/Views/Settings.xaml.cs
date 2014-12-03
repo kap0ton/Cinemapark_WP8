@@ -24,6 +24,8 @@ namespace Cinemapark.Views
         {
             base.OnNavigatedTo(e);
             _settingsViewModel.LoadMultiplexes();
+            MultiplexListBox.UpdateLayout();
+            MultiplexListBox.ScrollIntoView(_settingsViewModel.SelectedMultiplex);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

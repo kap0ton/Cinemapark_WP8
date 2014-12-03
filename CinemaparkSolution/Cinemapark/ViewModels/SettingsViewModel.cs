@@ -1,6 +1,7 @@
 ﻿using Cinemapark.Lib;
 using Cinemapark.Lib.Entities;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Cinemapark.ViewModels
     class SettingsViewModel : INotifyPropertyChanged
     {
         private readonly AppSettings _appSettings;
+        private readonly DataService _dataService;
 
         private readonly ObservableCollection<Multiplex> _multiplexes;
         public ObservableCollection<Multiplex> Multiplexes
@@ -55,6 +57,7 @@ namespace Cinemapark.ViewModels
         public SettingsViewModel()
         {
             _appSettings = new AppSettings();
+            _dataService = new DataService();
             _multiplexes = new ObservableCollection<Multiplex>();
             ProgressBarIsIndeterminate = false;
             ProgressBarVisibility = Visibility.Collapsed;
@@ -62,10 +65,42 @@ namespace Cinemapark.ViewModels
 
         public void LoadMultiplexes()
         {
-            var client = new WebClient();
-            client.DownloadStringCompleted += GetMultiplexesCompleted;
-            client.DownloadStringAsync(new Uri(Multiplex.MultiplexUri, UriKind.Absolute));
-            UpdateProgressBar(true);
+            if (NeedToUpdate())
+            {
+                var client = new WebClient();
+                client.DownloadStringCompleted += GetMultiplexesCompleted;
+                client.DownloadStringAsync(new Uri(Multiplex.MultiplexUri, UriKind.Absolute));
+                UpdateProgressBar(true);
+            }
+            else
+            {
+                UpdateProgressBar(true);
+                var items = _dataService.GetMultiplexes();
+                PopulateMultiplexes(items);
+                UpdateProgressBar(false);
+            }
+        }
+
+        private bool NeedToUpdate()
+        {
+            var lastUpd = _appSettings.DateLastUpdated;
+            var upd = _appSettings.UpdateInterval;
+            switch (upd)
+            {
+                case UpdateIntervalEnum.Always:
+                    return true;
+                //case UpdateIntervalEnum.Never:
+                //    return false;
+                case UpdateIntervalEnum.Daily:
+                    return (lastUpd == DateTime.MinValue || lastUpd.Year != DateTime.Today.Year
+                        || lastUpd.Month != DateTime.Today.Month || lastUpd.Day != DateTime.Today.Day);
+                case UpdateIntervalEnum.SixHours:
+                    return (lastUpd == DateTime.MinValue) || ((DateTime.Now - lastUpd) > new TimeSpan(6, 0, 0));
+                case UpdateIntervalEnum.OneHour:
+                    return (lastUpd == DateTime.MinValue) || ((DateTime.Now - lastUpd) > new TimeSpan(1, 0, 0));
+                default:
+                    return true;
+            }
         }
 
         private void GetMultiplexesCompleted(object sender, DownloadStringCompletedEventArgs e)
@@ -78,14 +113,12 @@ namespace Cinemapark.ViewModels
                 }
                 else
                 {
-                    var items = DataService.ParseMultiplexCollection(e.Result);
+                    var items = Multiplex.ParseMultiplexCollection(e.Result);
 
-                    Multiplexes.Clear();
-                    foreach (var multiplex in items)
-                    {
-                        Multiplexes.Add(multiplex);
-                    }
-                    SetSelectedMultiplex();
+                    PopulateMultiplexes(items);
+
+                    _dataService.SaveMultiplexes(items);
+                    _appSettings.DateLastUpdated = DateTime.Now;
                 }
             }
             catch (Exception ex)
@@ -96,6 +129,16 @@ namespace Cinemapark.ViewModels
             {
                 UpdateProgressBar(false);
             }
+        }
+
+        private void PopulateMultiplexes(List<Multiplex> items)
+        {
+            Multiplexes.Clear();
+            foreach (var multiplex in items)
+            {
+                Multiplexes.Add(multiplex);
+            }
+            SetSelectedMultiplex();
         }
 
         private void SetSelectedMultiplex()

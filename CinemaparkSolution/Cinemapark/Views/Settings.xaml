@@ -6,6 +6,7 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:model="clr-namespace:Cinemapark.Lib.Entities"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -34,19 +35,49 @@
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
 
-            <ListBox x:Name="MultiplexListBox" ItemsSource="{Binding Path=Multiplexes}" SelectedItem="{Binding Path=SelectedMultiplex, Mode=TwoWay}">
-                <ListBox.Resources>
-                    <DataTemplate x:Key="MultiplexDataTemplate">
-                        <StackPanel Orientation="Horizontal" Margin="15, 7,0,7">
-                            <TextBlock Text="{Binding Path=City}" TextWrapping="NoWrap" FontSize="21.333" VerticalAlignment="Center" />
-                            <TextBlock Text="{Binding Path=Title}" TextWrapping="NoWrap" Margin="15,0,0,0" FontSize="24" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.Resources>
-                <ListBox.ItemTemplate>
-                    <StaticResource ResourceKey="MultiplexDataTemplate"/>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <controls:Pivot>
+                <controls:PivotItem Header="multiplexes">
+                    <ListBox x:Name="MultiplexListBox" ItemsSource="{Binding Path=Multiplexes}" SelectedItem="{Binding Path=SelectedMultiplex, Mode=TwoWay}">
+                        <ListBox.Resources>
+                            <DataTemplate x:Key="MultiplexDataTemplate">
+                                <StackPanel Orientation="Horizontal" Margin="15, 7,0,7">
+                                    <TextBlock Text="{Binding Path=City}" TextWrapping="NoWrap" FontSize="21.333" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Path=Title}" TextWrapping="NoWrap" Margin="15,0,0,0" FontSize="24" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.Resources>
+                        <ListBox.ItemTemplate>
+                            <StaticResource ResourceKey="MultiplexDataTemplate"/>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </controls:PivotItem>
+                
+                <controls:PivotItem Header="options">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="1" Padding="10,0" TextWrapping="Wrap" Text="update data from the server:" />
+                        <ListBox Grid.Row="1" Grid.Column="1" Padding="10,0">
+                            <ListBoxItem>always</ListBoxItem>
+                            <ListBoxItem>daily</ListBoxItem>
+                            <ListBoxItem>6 hours</ListBoxItem>
+                            <ListBoxItem>1 hour</ListBoxItem>
+                            <ListBoxItem>never</ListBoxItem>
+                        </ListBox>
+                        
+                    </Grid>
+                </controls:PivotItem>
+            </controls:Pivot>
+            
+            
 
         </Grid>
     </Grid>
